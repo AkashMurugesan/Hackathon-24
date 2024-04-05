@@ -1,5 +1,10 @@
+import pandas as pd
+
 from langchain.prompts import PromptTemplate
 from langchain.llms import CTransformers
+from flask import Flask, jsonify, request 
+# creating a Flask app 
+app = Flask(__name__) 
 
 ## Function To get response from LLAma 2 model
 
@@ -12,7 +17,7 @@ def getLLamaresponse(input_json):
                               'temperature':0.01})
     
     ## Prompt Template
-    template = """Hi {input_json}"""
+    template = """There are table data columns from data base: {input_json}. can you give use me some different graph with the dataset to understand the dataset better. can you make the result to be array of object in json (fields in JSON tilte, x field name, y field name, chartType) format."""
     
     prompt=PromptTemplate(input_variables=["input_json"],
                           template=template)
@@ -22,6 +27,15 @@ def getLLamaresponse(input_json):
     print(response)
     return response
 
-
-
-getLLamaresponse("{ productName: 'test', amount: 100, dateSold: '10-12-2001'}")
+@app.route('/dashboard', methods = ['GET']) 
+def dashboard(): 
+    data = pd.read_csv('../../results.csv')
+    df = pd.DataFrame(data)
+    return jsonify(getLLamaresponse(str(df.columns)))
+  
+  
+# driver function 
+if __name__ == '__main__': 
+  
+    app.run(debug = True) 
+    
