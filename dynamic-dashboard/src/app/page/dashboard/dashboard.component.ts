@@ -2,50 +2,39 @@ import { Component, OnInit } from '@angular/core';
 import { ChartComponent } from '../../shared/chart/chart.component';
 import { NgFor } from '@angular/common';
 import { ApiService } from '../../services/api.service';
+import * as ChartDataModel from '../../../assets/data.json';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [ChartComponent,NgFor],
+  imports: [ChartComponent, NgFor],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit {
-  chartTypes = ['line', 'bar', 'radar'];
+  data: any = ChartDataModel;
+  sourceData : any =[];
+  chartTypes = this.data.default.forEach((data:any) => {
+    data.forEach((data:any) => {
+      if(data.chartType)
+      this.sourceData.push(data)
+    })
+  })
 
-  chartData = {
-    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-    datasets: [
-      {
-        label: '# of values',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  options = {
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
-  };
-
-  constructor(private apiService: ApiService){
-  }
+  constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    this.getDashboard()
+    this.getDashboard();
   }
 
-  getDashboard(){
+  getDashboard() {
     this.apiService.getDashboard().subscribe({
-      next: (response) =>{
-        console.log(response)
-      }, error: (error) => {
-        console.log('error')
-      }
-    })
+      next: (response) => {
+        console.log(response);
+      },
+      error: (error) => {
+        console.log('error');
+      },
+    });
   }
 }

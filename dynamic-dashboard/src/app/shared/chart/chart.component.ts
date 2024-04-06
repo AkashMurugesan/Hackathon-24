@@ -6,7 +6,7 @@ import {
   OnInit,
 } from '@angular/core';
 import Chart from 'chart.js/auto';
-import { ChartData } from '../../../utils/chart/types';
+import { ChartData, SourceChartData } from '../../../utils/chart/types';
 
 @Component({
   selector: 'app-chart',
@@ -18,19 +18,28 @@ import { ChartData } from '../../../utils/chart/types';
 export class ChartComponent implements AfterViewInit {
   chart: any = [];
   dynamicCharts: any = [];
-  title = 'ng-chart';
-  @Input() chartData: ChartData = {};
-  @Input() chartTypes: any = '';
+  @Input() chartData: any  = {
+    chartType : 'line',
+    title: 'Dummy',
+    xColumnData: [],
+    yColumnData: [],
+    xColumnName: '',
+    yColumnName: ''
+  }
   @Input() chartId: string = '';
   constructor() {}
-
   ngAfterViewInit() {
-
     this.chart = new Chart(this.chartId, {
-      type:this.chartTypes,
+      type:this.chartData.chartType,
       data: {
-        labels: this.chartData?.labels,
-        datasets: this.chartData.datasets,
+        labels: this.chartData?.xColumnData,
+        datasets: [
+          {
+            label: this.chartData.title,
+            data: this.chartData.yColumnData,
+            backgroundColor: '#006AFF' 
+          },
+        ]
       },
       options: {
         scales: {

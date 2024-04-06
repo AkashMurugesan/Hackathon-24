@@ -1,3 +1,3 @@
-<div *ngFor="let chart of chartTypes;index as i">
-    <app-chart [chartData]="chartData" [chartTypes]="chart" [chartId]="chart + i" />
+<div *ngFor="let chart of sourceData;index as i">
+    <app-chart [chartData]="chart" [chartId]="chart + i" />
 </div>
