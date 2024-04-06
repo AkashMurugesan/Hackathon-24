@@ -1,4 +1,6 @@
+import re
 import pandas as pd
+import json
 
 from langchain.prompts import PromptTemplate
 from langchain.llms import CTransformers
@@ -8,7 +10,7 @@ app = Flask(__name__)
 
 ## Function To get response from LLAma 2 model
 
-def getLLamaresponse(input_json):
+def getLLamaresponse(template, input_json):
 
     ### LLama2 model
     llm=CTransformers(model='models/llama-2-7b-chat.ggmlv3.q8_0.bin',
@@ -17,7 +19,7 @@ def getLLamaresponse(input_json):
                               'temperature':0.01})
     
     ## Prompt Template
-    template = """There are table data columns from data base: {input_json}. can you give use me some different graph with the dataset to understand the dataset better. can you make the result to be array of object in json (fields in JSON tilte, x field name, y field name, chartType) format."""
+    
     
     prompt=PromptTemplate(input_variables=["input_json"],
                           template=template)
@@ -28,10 +30,43 @@ def getLLamaresponse(input_json):
     return response
 
 @app.route('/dashboard', methods = ['GET']) 
-def dashboard(): 
-    data = pd.read_csv('../../results.csv')
+def dashboard():
+    data = pd.read_csv('./UCI_Heart_Disease_Dataset_Combined.csv')
     df = pd.DataFrame(data)
-    return jsonify(getLLamaresponse(str(df.columns)))
+    templateOfContentType = """There are table data columns from data base: {input_json}.
+        Could you provide the column name and then suggest a commonly used table name? Please offer a single name, and you will  finalize it by your own, From your response, I need just one word, not details, please."""
+    content = getLLamaresponse(templateOfContentType, str(df.columns))
+    match = re.search(r'"([^"]*)"', content)
+    if match:
+        table_name = match.group(1)
+    
+    lineTemplate = """There are table data columns from the database: {input_json} .
+    Can you suggest me with some possible line chart using this dataset for visualization? 
+    Please do not include any extra details or sample inputs.
+    The result should be array of object in json (fields in JSON object with following keys (tilte, xColumnName , yColumnName, chartType(only line charts)), xcolumnName and yColumnName are name of table column) format"""
+    
+    pieTemplate = """There are table data columns from the database: {input_json} .
+    Can you suggest me with some possible pie chart using this dataset for visualization? 
+    Please do not include any extra details or sample inputs.
+    The result should be array of object in json (fields in JSON object with following keys (tilte, columnName), columnName is name of table column) format"""
+    lineResponse = getLLamaresponse(lineTemplate, ', '.join(df.columns))
+    pieResponse = getLLamaresponse(pieTemplate, ', '.join(df.columns))
+    start_idx = lineResponse.find('[')
+    end_idx = lineResponse.rfind(']') + 1
+
+    # Extract the array substring
+    array_string = lineResponse[start_idx:end_idx]
+
+    # Load the array as JSON
+    array = json.loads(array_string)
+    for arr in array:
+        if arr['chartType'] == "line":
+            arr['plot'] = df[arr['xColumnName']].tolist()
+            arr['yColumnData'] = df[arr['yColumnName']].tolist()
+        elif arr['chartType'] == "pie":
+            count = df[arr['columnName']].value_counts()
+            arr['columnData'] = count
+    return array
   
   
 # driver function 
