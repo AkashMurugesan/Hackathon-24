@@ -15,7 +15,7 @@ export class ApiService {
 	 * @returns Observable
 	 */
 	httpGet(url: string): Observable<any> {
-		return this.http.get<Response>(url, defaultHttpOptions).pipe(
+		return this.http.get<Response>(url).pipe(
 			map(res => res),
 			catchError(err => this._handleError(err))
 		);

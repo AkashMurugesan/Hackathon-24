@@ -5,6 +5,7 @@ import json
 from langchain.prompts import PromptTemplate
 from langchain.llms import CTransformers
 from flask import Flask, jsonify, request 
+from flask_cors import CORS, cross_origin
 # creating a Flask app 
 app = Flask(__name__) 
 
@@ -30,8 +31,9 @@ def getLLamaresponse(template, input_json):
     return response
 
 @app.route('/dashboard', methods = ['GET']) 
-def dashboard():
-    data = pd.read_csv('../csv/UCI_Heart_Disease_Dataset_Combined.csv')
+@cross_origin()
+def dashboard(): 
+    data = pd.read_csv('./csv/results.csv')
     df = pd.DataFrame(data)
     templateOfContentType = """There are table data columns from data base: {input_json}.
         Could you provide the column name and then suggest a commonly used table name? Please offer a single name, and you will  finalize it by your own, From your response, I need just one word, not details, please."""
