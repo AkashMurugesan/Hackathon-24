@@ -14,13 +14,7 @@ import * as ChartDataModel from '../../../assets/data.json';
 export class DashboardComponent implements OnInit {
   data: any = ChartDataModel;
   sourceData : any =[];
-  chartTypes = this.data.default.forEach((data:any) => {
-    data.forEach((data:any) => {
-      if(data.chartType)
-      this.sourceData.push(data)
-    })
-  })
-
+  
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
