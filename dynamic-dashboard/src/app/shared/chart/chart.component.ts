@@ -1,5 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+} from '@angular/core';
 import Chart from 'chart.js/auto';
+import { ChartData } from '../../../utils/chart/types';
 
 @Component({
   selector: 'app-chart',
@@ -8,24 +15,22 @@ import Chart from 'chart.js/auto';
   templateUrl: './chart.component.html',
   styleUrl: './chart.component.scss',
 })
-export class ChartComponent implements OnInit {
+export class ChartComponent implements AfterViewInit {
   chart: any = [];
+  dynamicCharts: any = [];
   title = 'ng-chart';
-
+  @Input() chartData: ChartData = {};
+  @Input() chartTypes: any = '';
+  @Input() chartId: string = '';
   constructor() {}
 
-  ngOnInit() {
-    this.chart = new Chart('canvas', {
-      type: 'bar',
+  ngAfterViewInit() {
+
+    this.chart = new Chart(this.chartId, {
+      type:this.chartTypes,
       data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        datasets: [
-          {
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            borderWidth: 1,
-          },
-        ],
+        labels: this.chartData?.labels,
+        datasets: this.chartData.datasets,
       },
       options: {
         scales: {
