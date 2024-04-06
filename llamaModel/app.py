@@ -52,7 +52,6 @@ def dashboard():
     Please do not include any extra details or sample inputs.
     The result should be array of object in json (fields in JSON object with following keys (tilte, columnName), columnName is name of table column) format"""
     lineResponse = getLLamaresponse(lineTemplate, ', '.join(df.columns))
-    pieResponse = getLLamaresponse(pieTemplate, ', '.join(df.columns))
     start_idx = lineResponse.find('[')
     end_idx = lineResponse.rfind(']') + 1
 
@@ -62,13 +61,16 @@ def dashboard():
     # Load the array as JSON
     array = json.loads(array_string)
     for arr in array:
-        if arr['chartType'] == "line":
-            arr['plot'] = df[arr['xColumnName']].tolist()
-            arr['yColumnData'] = df[arr['yColumnName']].tolist()
-        elif arr['chartType'] == "pie":
-            count = df[arr['columnName']].value_counts()
-            arr['columnData'] = count
-    return array
+        arr['xColumnData'] = df[arr['xColumnName']].tolist()
+        arr['yColumnData'] = df[arr['yColumnName']].tolist()
+
+    pieResponse = getLLamaresponse(pieTemplate, ', '.join(df.columns))
+    pie_string = pieResponse[pieResponse.find('['): (pieResponse.rfind(']')+1)]
+    pie_array = json.loads(pie_string)
+    for arr in pie_array:
+        count = df[arr['columnName']].value_counts()
+        arr['columnData'] = count.to_json()
+    return [array, array, pie_array]
   
   
 # driver function 
