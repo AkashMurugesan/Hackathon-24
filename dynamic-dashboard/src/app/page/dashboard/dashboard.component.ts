@@ -31,6 +31,30 @@ export class DashboardComponent implements OnInit {
     this.apiService.getDashboard().subscribe({
       next: (response) => {
         console.log(response);
+        this.getLineChart()
+      },
+      error: (error) => {
+        console.log('error');
+      },
+    });
+  }
+
+  getPieChart() {
+    this.apiService.getPieChart().subscribe({
+      next: (response) => {
+        console.log(response);
+      },
+      error: (error) => {
+        console.log('error');
+      },
+    });
+  }
+
+  getLineChart() {
+    this.apiService.getLineChart().subscribe({
+      next: (response) => {
+        console.log(response);
+        this.getPieChart();
       },
       error: (error) => {
         console.log('error');

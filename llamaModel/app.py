@@ -4,10 +4,11 @@ import json
 
 from langchain.prompts import PromptTemplate
 from langchain.llms import CTransformers
-from flask import Flask, jsonify, request 
+from flask import Flask, jsonify, request,make_response
 from flask_cors import CORS, cross_origin
 # creating a Flask app 
 app = Flask(__name__) 
+CORS(app, support_credentials=True)
 
 ## Function To get response from LLAma 2 model
 
@@ -51,7 +52,7 @@ def lineChart():
     for arr in array:
         arr['xColumnData'] = df[arr['xColumnName']].tolist()
         arr['yColumnData'] = df[arr['yColumnName']].tolist()
-    return array
+    return make_response(jsonify({ 'data': array}),200)
 
 
 @app.route('/pieChart', methods= ['GET'])
@@ -74,10 +75,16 @@ def pieChart():
     array = json.loads(array_string)
     for arr in array:
         count = df[arr['columnName']].value_counts()
-        arr['columnData'] = count.to_json()
+        keys =[]
+        values = []
+        for key, value in count.items():
+            keys.append(key)
+            values.append(value)
+        arr['xColumnData'] = keys
+        arr['yColumnData'] = values
         arr['chartType'] = 'pie'
     
-    return array
+    return make_response(jsonify({ 'data': array}),200)
 
     
 
@@ -122,7 +129,7 @@ def dashboard():
     #     arr['columnData'] = count.to_json()
     #     arr['chartType'] = 'pie'
     # return [array, pie_array]
-    return str(table_name)
+    return make_response(jsonify({ 'data': str(table_name)}),200)
   
 # driver function 
 if __name__ == '__main__': 

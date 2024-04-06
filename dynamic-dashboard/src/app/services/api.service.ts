@@ -25,6 +25,14 @@ export class ApiService {
     return this.httpGet('http://localhost:5000/dashboard')
   }
 
+  getPieChart(): Observable<any> {
+    return this.httpGet('http://localhost:5000/pieChart')
+  }
+
+  getLineChart(): Observable<any> {
+    return this.httpGet('http://localhost:5000/lineChart')
+  }
+
  /**
 	 * Throws an error to the API caller.
 	 * @param error The error response object
