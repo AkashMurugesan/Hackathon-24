@@ -30,7 +30,6 @@ export class DashboardComponent implements OnInit {
   getDashboard() {
     this.apiService.getDashboard().subscribe({
       next: (response) => {
-        console.log(response);
         this.getLineChart()
       },
       error: (error) => {
@@ -42,7 +41,9 @@ export class DashboardComponent implements OnInit {
   getPieChart() {
     this.apiService.getPieChart().subscribe({
       next: (response) => {
-        console.log(response);
+        response.data.forEach((data: any)=>{
+          this.sourceData.push(data)
+        })
       },
       error: (error) => {
         console.log('error');
@@ -53,7 +54,9 @@ export class DashboardComponent implements OnInit {
   getLineChart() {
     this.apiService.getLineChart().subscribe({
       next: (response) => {
-        console.log(response);
+        response.data.forEach((data: any)=>{
+          this.sourceData.push(data)
+        })
         this.getPieChart();
       },
       error: (error) => {
