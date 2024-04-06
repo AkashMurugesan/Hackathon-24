@@ -3,3 +3,5 @@ uvicorn
 ctransformers
 langchain
 python-box
+pandas
+flask-restful
